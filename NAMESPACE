@@ -1,0 +1,17 @@
+S3method("plot", "pkgndep")
+export("plot.pkgndep")
+S3method("print", "pkgndep")
+export("print.pkgndep")
+export("loaded_ns")
+export("pkgndep")
+export("unavailable_pkg")
+
+import(ComplexHeatmap)
+import(GetoptLong)
+import(crayon)
+import(grid)
+importFrom("callr", "r")
+importFrom("grDevices", "dev.interactive")
+importFrom("utils", "packageDescription", "read.table")
+importFrom("utils", "sessionInfo")
+
