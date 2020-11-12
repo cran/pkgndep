@@ -215,7 +215,7 @@ unavailable_pkg = function(x) {
 # If there are no dependency packages stored in ``x``, ``NULL`` is returned.
 # 
 # == value
-# A length-tow `grid::unit` object which corresponds to the width and height of the plot.
+# A list of two units that correspond to the width and height of the plot.
 #
 # == example
 # # See examples in `pkgndep()`.
@@ -276,17 +276,19 @@ plot.pkgndep = function(x, pkg_fontsize = 10, title_fontsize = 12, legend_fontsi
 		adjust_annotation_extension = FALSE,
 		column_title = qq("In total @{ncol(m)} namespaces are loaded directly or indirectly when loading @{x$package} (@{x$version})"),
 		column_title_gp = gpar(fontsize = title_fontsize))
+
 	decorate_annotation("n_pkg", {
-		grid.text("#Packages", y = unit(1, "npc") + ht_opt$TITLE_PADDING + 0.5*grobHeight(textGrob("A", gp = gpar(fontsize = title_fontsize))),
+		grid.text("#Packages", y = unit(1, "npc") + unit(7.5, "pt") + 0.5*grobHeight(textGrob("A", gp = gpar(fontsize = title_fontsize))),
 			gp = gpar(fontsize = title_fontsize))
 	})
 	decorate_annotation("sec", {
-		grid.text("Loading time", y = unit(1, "npc") + ht_opt$TITLE_PADDING + 0.5*grobHeight(textGrob("A", gp = gpar(fontsize = title_fontsize))),
+		grid.text("Loading time", y = unit(1, "npc") + unit(7.5, "pt") + 0.5*grobHeight(textGrob("A", gp = gpar(fontsize = title_fontsize))),
 			gp = gpar(fontsize = title_fontsize))
 	})
+	browser()
 	w = ComplexHeatmap:::width(ht)
 	h = ComplexHeatmap:::height(ht)
-	invisible(unit.c(w, h))
+	invisible(list(width = w, height = h))
 }
 
 # dep = function(pkg, verbose = TRUE) {

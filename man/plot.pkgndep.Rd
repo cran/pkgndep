@@ -44,7 +44,7 @@ of the plot:
 If there are no dependency packages stored in \code{x}, \code{NULL} is returned.
 }
 \value{
-A length-tow \code{\link[grid]{unit}} object which corresponds to the width and height of the plot.
+A list of two units that correspond to the width and height of the plot.
 }
 \examples{
 # See examples in `pkgndep()`.
