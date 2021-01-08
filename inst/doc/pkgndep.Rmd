@@ -71,11 +71,56 @@ plot(x)
 
 Executable examples:
 
-```{r, fig.width = 10, fig.height = 6, out.width = "80%", out.height = "80%"}
+```{r}
 library(pkgndep)
 x = pkgndep("ComplexHeatmap")
 x
+```
+
+```{r, echo = FALSE}
+pdf(NULL)
+size = plot(x)
+invisible(dev.off())
+width = as.numeric(size$width)
+height = as.numeric(size$height)
+```
+
+```{r, fig.width = width, fig.height = height, out.width = "100%"}
 plot(x)
+```
+
+By default, the heatmap has a fixed size, thus, when there are too many
+dependencies, the heatmap might be out of the figure area. In this case,
+`fix_size = FALSE` can be set in `plot()` so that the heatmap is adjusted to
+fit the figure area.
+
+```{r, eval = FALSE}
+plot(x, fix_size = FALSE)
+```
+
+If `fix_size` is set to `TRUE` (which is the default), The size of the whole
+heatmap can be obtained by:
+
+```{r, eval = FALSE}
+size = plot(x)  
+```
+
+where size is a `unit` object with the width and height of the whole heatmap.
+If you want to save the plot in to e.g. a PDF file that has the same size of
+the heatmap, you need to make the plot twice. The first one for saving the
+plot into a null graphics device, just to obtain the size of the plot:
+
+```{r, eval = FALSE}
+pdf(NULL) # a null device
+size = plot(x)
+dev.off()
+
+width = as.numeric(size[1])
+height = as.numeric(size[2])
+
+pdf(..., width = width, height = height)
+plot(x)
+dev.off()
 ```
 
 ## Statistics

@@ -191,6 +191,7 @@ unavailable_pkg = function(x) {
 # -title_fontsize Fontsize for the titles.
 # -legend_fontsize Fontsize for the legends.
 # -fix_size Should the rows and columns in the heatmap have fixed size?
+# -unit The unit of the returned figure width and height.
 # -... Other arguments.
 #
 # == details
@@ -198,7 +199,7 @@ unavailable_pkg = function(x) {
 #
 #     size = plot(x, fix_size = TRUE)
 #
-# where ``size`` is a `grid::unit` object with the width and height of the whole heatmap, in unit ``mm``.
+# where ``size`` is a `grid::unit` object with the width and height of the whole heatmap.
 # If you want to save the plot in to e.g. a PDF file that has the same size of the heatmap, you
 # need to make the plot twice. First save the plot into a null device, just to obtain the size 
 # of the plot:
@@ -206,8 +207,8 @@ unavailable_pkg = function(x) {
 #     pdf(NULL) # a null device
 #     size = plot(x, fix_size = TRUE)
 #     dev.off()
-#     width = convertX(size[1], "inches", valueOnly = TRUE)
-#     height = convertY(size[2], "inches", valueOnly = TRUE)
+#     width = as.numeric(size[1])
+#     height = as.numeric(size[2])
 #     pdf(..., width = width, height = height)
 #     plot(x)
 #     dev.off()
@@ -221,7 +222,7 @@ unavailable_pkg = function(x) {
 # # See examples in `pkgndep()`.
 #
 plot.pkgndep = function(x, pkg_fontsize = 10, title_fontsize = 12, legend_fontsize = 8, 
-	fix_size = !dev.interactive(), ...) {
+	fix_size = !dev.interactive(), unit = "in", ...) {
 
 	m = x$mat
 	row_split = x$pkg_category
@@ -285,9 +286,9 @@ plot.pkgndep = function(x, pkg_fontsize = 10, title_fontsize = 12, legend_fontsi
 		grid.text("Loading time", y = unit(1, "npc") + unit(7.5, "pt") + 0.5*grobHeight(textGrob("A", gp = gpar(fontsize = title_fontsize))),
 			gp = gpar(fontsize = title_fontsize))
 	})
-	browser()
-	w = ComplexHeatmap:::width(ht)
-	h = ComplexHeatmap:::height(ht)
+
+	w = convertWidth(ComplexHeatmap:::width(ht), unit)
+	h = convertHeight(ComplexHeatmap:::height(ht), unit)
 	invisible(list(width = w, height = h))
 }
 
