@@ -1,8 +1,8 @@
 Package: pkgndep
 Type: Package
 Title: Check the Heaviness of Package Dependencies
-Version: 1.0.2
-Date: 2021-1-8
+Version: 1.0.3
+Date: 2021-3-5
 Author: Zuguang Gu
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
 Depends: R (>= 3.5.0)
@@ -19,6 +19,6 @@ URL: https://github.com/jokergoo/pkgndep
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2021-01-08 08:48:58 UTC; jokergoo
+Packaged: 2021-03-05 12:15:00 UTC; guz
 Repository: CRAN
-Date/Publication: 2021-01-08 11:00:02 UTC
+Date/Publication: 2021-03-05 12:40:02 UTC
