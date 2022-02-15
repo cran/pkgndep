@@ -1,26 +1,49 @@
 
 
-<h2>Dependency information for package '<%=pkg$package%>'</h2>
+<h2>Dependency analysis for package <span class="package"><%=pkg$package%></span></h2>
 
-<table class="table table-striped" style="width:600px">
+<h3>General information</h3>
+
+<table class="table table-striped" style="width:700px">
 <% if(grepl("bioconductor", pkg$repository)) { %>
   <tr><th>Bioconductor link</th><td style="width:100px"> <a href='https://bioconductor.org/packages/<%=pkg$package%>/' target='_blank'>link</a></td></tr>
 <% } else { %>
-  <tr><th>CRAN link</th><td style="width:100px"> <a href='https://CRAN.R-project.org/package=<%=pkg$package%>/' target='_blank'>link</a></td></tr>
+  <tr><th>CRAN link</th><td style="width:100px"> <a href='https://CRAN.R-project.org/package=<%=pkg$package%>' target='_blank'>link</a></td></tr>
 <% } %>
 <tr><th>Package version</th><td><%= pkg$version%></td></tr>
-<tr><th>Strong dependencies</th><td><%= df[pkg$package, "n_by_strong"]%></td></tr>
-<tr><th>All dependencies</th><td><%= df[pkg$package, "n_by_all"]%></td></tr>
-<tr><th>Number of parent dependencies</th><td><%= df[pkg$package, "n_parents"]%></td></tr>
-<tr><th>Gini index of parent heaviness</th><td><%= round(df[pkg$package, "gini_index"], 2)%></td></tr>
+<tr><th>Number of strong dependencies</th><td><%= df[pkg$package, "n_by_strong"]%></td></tr>
+<tr><th>Number of all dependencies</th><td><%= df[pkg$package, "n_by_all"]%></td></tr>
+<tr><th>Number of parent packages</th><td><%= df[pkg$package, "n_parents"]%></td></tr>
+<tr><th>Max heaviness from parent packages</th><td><%= if(any(pkg$which_required)) max(pkg$heaviness[pkg$which_required]) else 0 %></td></tr>
+<tr><th>Total heaviness from parent packages</th><td><%= if(any(pkg$which_required)) sum(pkg$heaviness[pkg$which_required]) else 0 %></td></tr>
+<tr><th>Number of parent packages (including <code>Suggests</code> and <code>Enhances</code>)</th><td><%= length(pkg$heaviness) %></td></tr>
 <tr><th>Heaviness on child packages</th><td><%= round(df[pkg$package, "heaviness_on_children"], 1)%></td></tr>
 <tr><th>Number of child packages</th><td><%= df[pkg$package, "n_children"]%></td></tr>
-<tr><th>Heaviness on downstream packages</th><td><%= round(df[pkg$package, "heaviness_on_downstream"], 1)%></td></tr>
+<tr><th>Heaviness on downstream packages <a id="downstream-package-note" class="fake-link" title="Note: downstream packages include child packages.">?</a></th><td><%= round(df[pkg$package, "heaviness_on_downstream"], 1)%></td></tr>
 <tr><th>Number of downstream packages</th><td><%= df[pkg$package, "n_downstream"]%></td></tr>
+<tr><th>Heaviness on indirect downstream packages (excluding child packages)</th><td><%= round(df[pkg$package, "heaviness_on_downstream_no_children"], 1)%></td></tr>
+<tr><th>Number of indirect downstream packages (excluding child packages)</th><td><%= df[pkg$package, "n_downstream_no_children"]%></td></tr>
+
 </table>
 
+<script>
+$(function() {
+  $("#downstream-package-note").tooltip();
+});
+</script>
+
 <h3>Dependency heatmap</h3>
-<div id='ht_container'>
+
+<p>In the following dependency heatmap, rows are the parent packages of <span class="package"><%=pkg$package%></span> and columns are the dependency packages that each parent package brings in.
+On the right side of the heatmap, there are three barplot annotations: 1. number of imported functions/S4 methods/S4 classes from parent packages; 2. number of
+dependency packages from each parent package; 3. heaviness of each parent package on <span class="package"><%=pkg$package%></span>.</p>
+
+<div style="padding-bottom: 0.5em;">Adjust heatmap size:   
+                    <button type="button" class="btn btn-default btn-xs" onclick="increase_ht_size()">increase</button>
+                    <button type="button" class="btn btn-default btn-xs" onclick="decrease_ht_size()">decrease</button>
+                    <button type="button" class="btn btn-default btn-xs" onclick="reset_ht_size()">reset</button>
+</div>
+<div id='ht_container' style="border: 1px solid #c5c5c5;border-radius: 3px; padding:3px;">
 
 <% tmp_file = paste0(env$figure_dir, "/", pkg$package, "_dependency_heatmap.svg")
 
@@ -37,14 +60,14 @@ if(!file.exists(tmp_file)) {
 <div id="tabs">
 
   <ul>
-    <li><a href="#parent_dependency">Parent dependency</a></li>
-    <li><a href="#upstream_dependency">Upstream dependency</a></li>
-    <li><a href="#children_dependency">Children dependencies</a></li>
+    <li><a href="#parent_dependency">Parent dependencies</a></li>
+    <li><a href="#upstream_dependency">Upstream dependencies</a></li>
+    <li><a href="#child_dependency">Child dependencies</a></li>
     <li><a href="#downstream_dependency">Downstream dependencies</a></li>
   </ul>
 
 <div id="parent_dependency">
-<div id="parent_dependency_content"><p>Loading table...</p></div>
+<div id="parent_dependency_content"><p>Loading content...</p></div>
 
 <script>
 $.ajax({
@@ -56,7 +79,7 @@ $.ajax({
 </div>
 
 <div id="upstream_dependency">
-  <div id="upstream_dependency_content"><p>Loading table...</p></div>
+  <div id="upstream_dependency_content"><p>Loading content...</p></div>
 <script>
 $.ajax({
   url: "upstream_dependency?package=<%=pkg$package%>"
@@ -66,19 +89,19 @@ $.ajax({
 </script>
 </div>
 
-<div id="children_dependency">
-  <div id="children_dependency_content"><p>Loading table...</p></div>
+<div id="child_dependency">
+  <div id="child_dependency_content"><p>Loading content...</p></div>
 <script>
 $.ajax({
-  url: "children_dependency?package=<%=pkg$package%>"
+  url: "child_dependency?package=<%=pkg$package%>"
 }).done(function(html) {
-  $("#children_dependency_content").html(html);
+  $("#child_dependency_content").html(html);
 });
 </script>
 </div>
 
 <div id="downstream_dependency">
-  <div id="downstream_dependency_content"><p>Loading table...</p></div>
+  <div id="downstream_dependency_content"><p>Loading content...</p></div>
 <script>
 $.ajax({
   url: "downstream_dependency?package=<%=pkg$package%>"
@@ -92,7 +115,15 @@ $.ajax({
 
   <script>
   $( function() {
-    $( "#tabs" ).tabs();
+    $( "#tabs" ).tabs({
+      // activate: function(event, ui) {
+      //   if(ui.newTab.text() === "Upstream dependency") {
+      //     load_upstream_dep_nt();
+      //   } else if(ui.newTab.text() === "Downstream dependency") {
+      //     load_downstream_dep_nt();
+      //   }
+      // }
+    });
   } );
   </script>
 

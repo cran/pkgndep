@@ -4,9 +4,9 @@
 #
 # == param
 # -x An object from `pkgndep`.
-# -pkg_fontsize Fontsize for the package names.
-# -title_fontsize Fontsize for the title.
-# -legend_fontsize Fontsize for the legends.
+# -pkg_fontsize Font size for the package names.
+# -title_fontsize Font size for the title.
+# -legend_fontsize Font size for the legends.
 # -fix_size Should the rows and columns in the heatmap have fixed size?
 # -cex A factor multiplicated to all font sizes.
 # -help Whether to print help message?
@@ -87,6 +87,30 @@ plot.pkgndep = function(x, pkg_fontsize = 10*cex, title_fontsize = 12*cex,
 			}
 
 			return(invisible(NULL))
+		} else if(grepl("\\.pdf$", file, ignore.case = TRUE)) {
+			pdf(NULL)
+			size = plot(x, fix_size = TRUE, pkg_fontsize = pkg_fontsize, title_fontsize = title_fontsize,
+				legend_fontsize = legend_fontsize, cex = cex, help = FALSE, file = NULL)
+			dev.off()
+
+			if(!is.null(size)) {
+				size[1] = max(size[1], 7)
+				size[2] = max(size[2], 3)
+				pdf(file, width = size[1], height = size[2])
+				plot(x, fix_size = TRUE, pkg_fontsize = pkg_fontsize, title_fontsize = title_fontsize,
+					legend_fontsize = legend_fontsize, cex = cex, help = FALSE, file = NULL)
+				dev.off()
+			} else {
+				pdf(file, width = 5, height = 1)
+				if(nrow(x$dep_mat) > 0 && ncol(x$dep_mat) == 0) {
+					grid.text(qq("All required packages for '@{x$package}' are base packages."), 0.5, 0.5)
+				} else {
+					grid.text(qq("No dependency found for package '@{x$package}'"), 0.5, 0.5)
+				}
+				dev.off()
+			}
+
+			return(invisible(NULL))
 		} else if(grepl("\\.svg$", file, ignore.case = TRUE)) {
 			tmp_file = tempfile()
 			svg(tmp_file)
@@ -120,7 +144,7 @@ plot.pkgndep = function(x, pkg_fontsize = 10*cex, title_fontsize = 12*cex,
 
 			return(invisible(NULL))
 		} else {
-			stop("`file` only allows extensions of 'png/jpg/svg'.")
+			stop("`file` only allows extensions of 'png/jpg/svg/pdf'.")
 		}
 	}
 
@@ -144,7 +168,7 @@ plot.pkgndep = function(x, pkg_fontsize = 10*cex, title_fontsize = 12*cex,
 	m2 = m
 	m2[, colnames(m) %in% BASE_PKGS] = m2[, colnames(m) %in% BASE_PKGS] * 2
 
-	dep_fields_col = structure(c("#1B9E77", "#7570B3", "#D95F02", "#E7298A", "#66A61E"), names =  c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances"))
+    dep_fields_col = structure(c("#d9534f", "#f0ad4e", "#337ab7", "#5cb85c", "#5bc0de"), names =  c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances"))
 
 	ht = Heatmap(m2, 
 		name = x$package,
@@ -167,14 +191,14 @@ plot.pkgndep = function(x, pkg_fontsize = 10*cex, title_fontsize = 12*cex,
 		cluster_columns = FALSE,
 		bottom_annotation = HeatmapAnnotation(
 			required1 = anno_simple(
-				ifelse(colnames(m) %in% setdiff(required_dependency_packages(x), rownames(m)[is_field_required(x)]), "yes", "no"),
+				ifelse(colnames(m) %in% required_dependency_packages(x) & colSums(m[x$which_required, , drop = FALSE]) > 0, "yes", "no"),
 				col = c("yes" = "purple", "no" = "white"),
 				height = unit(1, "mm")
 			), 
 			loaded1 = if(length(x$pkg_from_session_info) == 0) NULL else anno_simple(
 				ifelse(colnames(m) %in% x$pkg_from_session_info, "yes", "no"),
 				col = c("yes" = "white", "no" = "white"),
-				pch = ifelse(colnames(m) %in% setdiff(x$pkg_from_session_info, rownames(m)[is_field_required(x)]), 16, NA), 
+				pch = ifelse(colnames(m) %in% x$pkg_from_session_info, 16, NA), 
 				pt_size = unit(2, "mm"), pt_gp = gpar(col = "purple"),
 				height = unit(2, "mm")
 			),
@@ -217,11 +241,16 @@ plot.pkgndep = function(x, pkg_fontsize = 10*cex, title_fontsize = 12*cex,
     	legend_labels = legend_labels[1:3]
     }
 	
-    lgd0 = Legend(labels = legend_labels,
+	# for the lower version of ComplexHeatmap
+    if(packageVersion("ComplexHeatmap") > "2.7.1") {
+    	lgd0 = Legend(labels = legend_labels,
 			graphics = graphics,
 			title = "", labels_gp = gpar(fontsize = legend_fontsize))
-	lgd_list = list(lgd0)
-
+		lgd_list = list(lgd0)
+	} else {
+		lgd_list = NULL
+	}
+	
 	df_imports = x$df_imports
 	if(any(x$which_suggested_but_also_loaded)) {
 		df_imports[x$which_suggsted_but_also_loaded, 1] = -Inf
@@ -235,13 +264,13 @@ plot.pkgndep = function(x, pkg_fontsize = 10*cex, title_fontsize = 12*cex,
 
 	ht = ht + rowAnnotation(n_pkg = anno_barplot(rowSums(x$dep_mat), width = unit(1, "cm"),
 								axis_param = list(gp = gpar(fontsize = 8*cex)), gp = gpar(fill = "#808080", col = NA)),
-			annotation_label = "Loaded\nnamespaces", annotation_name_rot = 60,
+			annotation_label = "Required\npackages", annotation_name_rot = 60,
 			annotation_name_gp = gpar(fontsize = pkg_fontsize),
 			annotation_name_offset = unit(8, "mm"))
 
 	ht = ht + rowAnnotation(heaviness = anno_barplot(x$heaviness, width = unit(1, "cm"), ylim = if(all(x$heaviness == 0)) c(0, 1) else NULL,
 								axis_param = list(gp = gpar(fontsize = 8*cex)), gp = gpar(fill = "#808080", col = NA)),
-			annotation_label = "Heaviness\nfrom parents", annotation_name_rot = 60,
+			annotation_label = "Heaviness from \nparents", annotation_name_rot = 60,
 			annotation_name_gp = gpar(fontsize = pkg_fontsize),
 			annotation_name_offset = unit(8, "mm"))
 	
@@ -392,8 +421,13 @@ anno_nimports_barplot = function(x, category,
 		height = anno_size$height,
 		var_import = list(x, category, border, bar_width, axis, axis_param, anno_size, ylim, gp, is_field_required)
 	)
-		
-	anno@subsetable = TRUE
+	
+	cl = new("AnnotationFunction")
+	if("subsettable" %in% slotNames(cl)) {
+		anno@subsettable = TRUE
+	} else {
+		anno@subsetable = FALSE
+	}
 
 	axis_param = ComplexHeatmap:::validate_axis_param(axis_param, which)
 	axis_grob = if(axis) ComplexHeatmap:::construct_axis_grob(axis_param, which, data_scale) else NULL

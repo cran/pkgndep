@@ -1,27 +1,25 @@
 Package: pkgndep
 Type: Package
-Title: Check the Heaviness of Package Dependencies
-Version: 1.1.0
-Date: 2021-11-09
+Title: Analyzing Dependency Heaviness of R Packages
+Version: 1.1.1
+Date: 2022-02-13
 Authors@R: person("Zuguang", "Gu", email = "z.gu@dkfz.de", role = c("aut", "cre"),
                   comment = c('ORCID'="0000-0002-7395-8709"))
 Depends: R (>= 3.5.0)
-Imports: ComplexHeatmap (>= 2.0.0), GetoptLong, utils, grid, hash,
-        methods, BiocManager, brew
-Suggests: knitr, rmarkdown, svglite, callr, rjson
-Description: It checks the heaviness of a package's dependencies, i.e. number of 
-    additional packages that are required for each of the direct dependency packages. 
-    For each package listed in the "Depends", "Imports", "LinkingTo", "Suggests" and
-    "Enhances" fields in the DESCRIPTION file, it checks how many additional packages 
-    it brings in. The summary of the dependency is visualized by a customized heatmap.
-    It also additionally creates a website that contains global package dependency
-    analysis for all packages on CRAN and Bioconductor (retrieved on 2021-10-28).
+Imports: ComplexHeatmap (>= 2.7.1), GetoptLong, GlobalOptions, utils,
+        grid, hash, methods, BiocManager, brew, BiocVersion
+Suggests: knitr, rmarkdown, svglite, callr, rjson, Rook, igraph,
+        ggplot2, ggrepel
+Description: A new metric named 'dependency heaviness' is proposed that measures the number 
+    of additional dependency packages that a parent package brings to its child package 
+    and are unique to the dependency packages imported by all other parents.  
+    The dependency heaviness analysis is visualized by a customized heatmap.
 URL: https://github.com/jokergoo/pkgndep
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2021-11-10 08:34:32 UTC; guz
+Packaged: 2022-02-15 09:19:01 UTC; guz
 Author: Zuguang Gu [aut, cre] (<https://orcid.org/0000-0002-7395-8709>)
 Maintainer: Zuguang Gu <z.gu@dkfz.de>
 Repository: CRAN
-Date/Publication: 2021-11-10 14:00:02 UTC
+Date/Publication: 2022-02-15 10:00:06 UTC

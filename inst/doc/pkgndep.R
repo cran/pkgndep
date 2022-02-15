@@ -1,4 +1,4 @@
-## ---- echo = FALSE------------------------------------------------------------
+## ---- echo = FALSE, message = FALSE-------------------------------------------
 library(pkgndep)
 pkgndep:::load_all_pkg_dep()
 
@@ -28,11 +28,19 @@ plot(pkg)
 #  plot(pkg, file = "test.png")
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  html_report(pkg)
+#  dependency_report(pkg)
 
 ## -----------------------------------------------------------------------------
 heaviness(pkg)
 heaviness(pkg, rel = TRUE)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  foo = function(...) {
+#      check_pkg("pkg", ...)
+#  
+#      pkg::bar(...)
+#      ...
+#  }
 
 ## ---- eval = FALSE------------------------------------------------------------
 #  db = available.packages(repos = BiocManager::repositories())
@@ -50,9 +58,6 @@ system.time(p2 <- db2$package_dependencies("cola", recursive = TRUE, simplify = 
 
 ## -----------------------------------------------------------------------------
 identical(sort(p1), sort(p2))
-
-## ---- eval = FALSE------------------------------------------------------------
-#  open_website()
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

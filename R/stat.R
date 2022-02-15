@@ -8,13 +8,13 @@
 # -a A constant added for calculating the relative measure.
 #
 # == details
-# The heaviness from a parent package is calculated as follows: If package B is in the "Depends"/"Imports"/"LinkingTo" fields of package A,
+# The heaviness from a parent package is calculated as follows: If package B is in the ``Depends``/``Imports``/``LinkingTo`` fields of package A,
 # which means, package B is necessary for package A, denote ``v1`` as the total numbers of packages required for package A,
-# and ``v2`` as the total number of required packages if moving package B to "Suggests" (which means, now B is not necessary when for A).
+# and ``v2`` as the total number of required packages if moving package B to ``Suggests`` (which means, now B is not necessary for A).
 # The absolute measure is simply ``v1 -  v2`` and relative measure is ``(v1 + a)/(v2 + a)``. 
 #
-# In the second scenario, if B is in the "Suggests/Enhances" fields of package A, now ``v2`` is the total number of required packages if moving
-# B to "Imports", the absolute measure is ``v2 - v1`` and relative measure is ``(v2 + a)/(v1 + a)``.
+# In the second scenario, if B is in the ``Suggests``/``Enhances`` fields of package A, now ``v2`` is the total number of required packages if moving
+# B to ``Imports``, the absolute measure is ``v2 - v1`` and relative measure is ``(v2 + a)/(v1 + a)``.
 #
 # == value
 # A numeric vector.
@@ -56,6 +56,100 @@ heaviness = function(x, rel = FALSE, a = 10) {
 	v
 }
 
+
+heaviness_by_pair = function(x, i, j, rel = FALSE, a = 10) {
+	p = required_dependency_packages(x, FALSE)
+	v1 = length(p)
+	v = 0
+	if(x$which_required[i] & x$which_required[j]) {
+
+		x2 = x
+		x2$dep_fields[i] = "Suggests"
+		x2$which_required[i] = FALSE
+		x2$which_required_but_not_loaded[i] = FALSE
+		p_i = setdiff(p, required_dependency_packages(x2, FALSE))
+
+		x2 = x
+		x2$dep_fields[j] = "Suggests"
+		x2$which_required[j] = FALSE
+		x2$which_required_but_not_loaded[j] = FALSE
+		p_j = setdiff(p, required_dependency_packages(x2, FALSE))
+
+		x2 = x
+		x2$dep_fields[c(i, j)] = "Suggests"
+		x2$which_required[c(i, j)] = FALSE
+		x2$which_required_but_not_loaded[c(i, j)] = FALSE
+		p_ij = setdiff(p, required_dependency_packages(x2, FALSE))
+
+		p_common = setdiff(p_ij, c(p_i, p_j))
+		v2 = length(p_common)
+
+		if(rel) {
+			v = (v1 + a)/((v1 - v2) + a)
+		} else {
+			v = v2
+		}
+	}
+	v
+}
+
+# == title
+# Co-heaviness for pairs of parent packages
+#
+# == param
+# -x An object returned by `pkgndep`.
+# -rel Whether to return the absolute measure or the relative measure.
+# -a A constant added for calculating the relative measure.
+#
+# == details
+# Denote a package as P and its two strong parent packages as A and B, i.e., parent packages in "Depends", "Imports" and "LinkingTo", 
+# the co-heaviness for A and B is calculated as follows.
+#
+# Denote S_A as the set of reduced dependency packages when only moving A to "Suggests" of P, and denote S_B as the set of reduced dependency
+# packages when only moving B to "Suggests" of P, denote S_AB as the set of reduced dependency packages when moving A and B together to "Suggests" of P,
+# the co-heaviness of A, B on P is calculatd as ``length(setdiff(S_AB, union(S_A, S_B)))``, which is the number of reduced package only caused by co-action of A and B.
+#
+# Note the co-heaviness is only calculated for parent packages in "Depends", "Imports" and "LinkingTo".
+#
+# == example
+# \dontrun{
+# x = pkgndep("DESeq2")
+# hm = co_heaviness(x)
+# ComplexHeatmap::Heatmap(hm)
+# }
+co_heaviness = function(x, rel = FALSE, a = 10) {
+
+	nr = nrow(x$dep_mat)
+	m = matrix(NA, nrow = nr, ncol = nr)
+	rownames(m) = colnames(m) = rownames(x$dep_mat)
+	diag(m) = heaviness(x, rel = rel, a = a)
+
+	if(nr <= 1) {
+		return(m)
+	}
+
+	max_pair = NULL
+	v = 0
+	for(i in 1:(nr-1)) {
+		for(j in (i+1):nr) {
+			m[i, j] = m[j, i] = heaviness_by_pair(x, i, j, rel, a)
+			if(m[i, j] > v) {
+				v = m[i, j]
+				max_pair = c(i, j)
+			}
+		}
+	}
+	if(length(max_pair)) {
+		max_pair = rownames(m)[max_pair]
+	}
+	m2 = m[x$which_required, x$which_required, drop = FALSE]
+	if(nrow(m2) > 1) {
+		attr(m2, "max") = max(m2[upper.tri(m2)])
+		attr(m2, "max_pair") = max_pair
+	}
+	m2
+}
+
 # == title
 # Heaviness on all child packages
 #
@@ -67,7 +161,9 @@ heaviness = function(x, rel = FALSE, a = 10) {
 # The value is the mean heaviness of the package on all its child packages.
 #
 # == example
+# \dontrun{
 # heaviness_on_children("ComplexHeatmap")
+# }
 heaviness_on_children = function(package, add_values_attr = FALSE) {
 	tb = child_dependency(package, fields = c("Depends", "Imports", "LinkingTo"))
 	if(nrow(tb)) {
@@ -97,20 +193,24 @@ heaviness_on_children = function(package, add_values_attr = FALSE) {
 #
 # == param
 # -package A package name.
-# -move_to_suggests Whether to move an ``Imports`` packages to ``Suggests`` or move a ``Suggesets`` package to ``Imports``?
 # -add_values_attr Whether to include "values" attribute? Internally used.
 #
 # == Value
 # The value is the mean heaviness of the package on all its downstream packages. Denote ``n`` as the number of all its downstream packages,
-# ``k_i`` as the number of required packages for package i (i.e. total packages loaded when only loading packages in ``Depends``, ``Imports`` and ``LinkingTo``),
-# ``v_1`` is the sum of required packages: ``v_1 = sum_i^n{k_i}``. Denote ``p_i`` as the number of required packages if moving ``package`` to ``Suggests``s,
-# and ``v_2`` as the sum of required packages: ``v_1 = sum_i^n{p_i}``. The final heaviniss on downstream packages is ``(v_1 - v_2)/n``.
+# ``k_i`` as the number of required packages for package i,
+# ``v_1`` as the total number of required packages for all downstream packages, i.e. ``v_1 = sum_i^n {k_i}``. Denote ``p_i`` as the number of required packages if moving ``package`` to ``Suggests``,
+# and ``v_2`` as the total number of required packages, i.e. ``v_1 = sum_i^n {p_i}``. The final heaviniss on downstream packages is ``(v_1 - v_2)/n``.
+#
+# Note since the interaction from ``package`` to its downstream packages may go through several intermediate packages, which means, the reduction of required packages
+# for a downstream package might be joint effects from all its upstream packages, thus, to properly calculate the heaviness of a package to its downstream packages, we first make 
+# a copy of the package database and move ``package`` to ``Suggests`` for all packages which depends on ``package``. Then for all downstream packages of ``package``, dependency analysis
+# by `pkgndep` is redone with the modified package database. Finally, the heaviness on downstream packages is collected and the mean heaviness is calculated.
 #
 # == example
 # \dontrun{
 # heaviness_on_downstream("ComplexHeatmap")
 # }
-heaviness_on_downstream = function(package, move_to_suggests = TRUE, add_values_attr = FALSE) {
+heaviness_on_downstream = function(package, add_values_attr = FALSE) {
 
 	if(inherits(package, "pkgndep")) package = package$package
 
@@ -119,7 +219,7 @@ heaviness_on_downstream = function(package, move_to_suggests = TRUE, add_values_
 
 	pkg_db = env$pkg_db_snapshot$copy()
 
-	if(move_to_suggests) {
+	# if(move_to_suggests) {
 		pkg_db$dependency = lapply(pkg_db$dependency, function(db) {
 			l = db[, "dependency"] == package
 			if(any(l)) {
@@ -127,15 +227,15 @@ heaviness_on_downstream = function(package, move_to_suggests = TRUE, add_values_
 			}
 			db
 		})
-	} else {
-		pkg_db$dependency = lapply(pkg_db$dependency, function(db) {
-			l = db[, "dependency"] == package
-			if(any(l)) {
-				db[l, "dep_fields"] = "Imports"
-			}
-			db
-		})
-	}
+	# } else {
+	# 	pkg_db$dependency = lapply(pkg_db$dependency, function(db) {
+	# 		l = db[, "dependency"] == package
+	# 		if(any(l)) {
+	# 			db[l, "dep_fields"] = "Imports"
+	# 		}
+	# 		db
+	# 	})
+	# }
 
 	# only rerun for downstrema packages
 	lt = env$all_pkg_dep
@@ -149,7 +249,6 @@ heaviness_on_downstream = function(package, move_to_suggests = TRUE, add_values_
 	pkg = unique(tb[, "children"])
 
 	pkg = intersect(pkg, names(lt))
-
 
 	n = length(pkg)
 	s1 = s2 = numeric(n)

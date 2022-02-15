@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 library(pkgndep)
 pkgndep:::load_all_pkg_dep()
 ```
@@ -72,7 +72,7 @@ packages are required, which are really a lot. Actually some of the heavy
 packages such as **WGCNA**, **clusterProfiler** and **ReactomePA** (the last
 three packages in the heatmap rows) are not very frequently used in **cola**,
 moving them to `Suggests` field and using them only when they are needed
-greatly helps to reduce the heaviness of **cola**. Now the number of required
+greatly helps to reduce the dependencies of **cola**. Now the number of required
 packages are reduced to only `r x$n_by_strong`.
 
 ## Usage
@@ -91,6 +91,8 @@ or
 pkg = pkgndep("path-of-the-package")  # if the package has not been installed yet
 plot(pkg)
 ```
+
+The value for `pkgndep()` should be 1. a CRAN/Bioconductor package, 2. an installed package, 3. a path of a local package, 4. URL of a GitHub repository.
 
 Executable examples:
 
@@ -117,16 +119,16 @@ plot(pkg)
 ```
 
 You can set the `file` argument to directly save the image into a figure where the figure
-size is automatically calculated. Supported image formats are `png`/`jpg`/`svg`.
+size is automatically calculated. Supported image formats are `png`/`jpg`/`svg`/`pdf`.
 
 ```{r, eval = FALSE}
 plot(pkg, file = "test.png")
 ```
 
-`html_report()` function can generate a html report for the dependency analysis on the package:
+`dependency_report()` function can generate an HTML report for the dependency analysis on the package.
 
 ```{r, eval = FALSE}
-html_report(pkg)
+dependency_report(pkg)
 ```
 
 ## Heaviness
@@ -134,17 +136,17 @@ html_report(pkg)
 The heaviness of package dependency can be measured quantitatively. **pkgndep** provides two measures: the absolute
 measure and the relative measure.
 
-The heaviness of a dependency package is calculated as follows. If package B
-is in the `Depends`/`Imports`/`LinkingTo` fields of package A, which means, package B 
-is directly required for package A, denote `v1` as the total number of packages for package A, 
+The heaviness of a dependency package is calculated as follows. If package _B_
+is in the `Depends`/`Imports`/`LinkingTo` fields of package _A_, which means, package _B_ 
+is directly required for package _A_, denote `v1` as the total number of packages for package _A_, 
 and denote `v2` as the total number of required packages if moving package
-B to `Suggests` in package A (which means, now B is not enforced to be installed for package A). The
+_B_ to `Suggests` in package _A_ (which means, now _B_ is not enforced to be installed for package _A_). The
 absolute measure of heaviness is simply `v1 - v2` and relative measure is `(v1 + a)/(v2 + a)` where `a` is a small constant, e.g. 10.
-So here the absolute heaviness for package B on package A is the number of additional packages
-that package B brings in.
+So here the absolute heaviness for package _B_ on package _A_ is the number of additional packages
+that package _B_ uniquely brings in.
 
-In the second scenario, if package B is in the `Suggests`/`Enhances` fields of package
-A, now `v2` is the total number of required packages if moving package B to `Imports` in package A,
+In the second scenario, if package _B_ is in the `Suggests`/`Enhances` fields of package
+_A_, now `v2` is the total number of required packages if moving package _B_ to `Imports` in package _A_,
 the absolute measure of heaviness is `v2 - v1` and relative measure is `(v2 + a)/(v1 + a)`.
 
 The heaviness score can be calculated by the function `heaviness()`:
@@ -152,6 +154,25 @@ The heaviness score can be calculated by the function `heaviness()`:
 ```{r}
 heaviness(pkg)
 heaviness(pkg, rel = TRUE)
+```
+
+## Check the availability of packages
+
+We suggest to move heavy parent packages that are less used to `Suggests` and they are only loaded when the corresponding functions are called. 
+Dependency packages listed in `Suggests` by default are not mandatory to be installed, thus, there will be errors when the functions are called but these dependency packages
+are not installed yet. **pkgndep** provides a function `check_pkg()` that checks the availability of a package, and if the package has not been 
+installed yet, `check_pkg()` prints friendly messages to guide user to install it. 
+
+Assume `foo()` is a function that uses another function `bar()` from a heavy parent **pkg**, 
+`foo()` can be written as:
+
+```{r, eval = FALSE}
+foo = function(...) {
+    check_pkg("pkg", ...)
+
+    pkg::bar(...)
+    ...
+}
 ```
 
 ## A fast version of `tools::package_dependencies()`
@@ -188,18 +209,10 @@ system.time(p2 <- db2$package_dependencies("cola", recursive = TRUE, simplify = 
 identical(sort(p1), sort(p2))
 ```
 
-## A global dependency analysis on all packages on CRAN/Bioconductor
+## Heaviness analysis for all CRAN/Bioconductor packages
 
-**pkgndep** also integrates an web-based database of the dependency analysis of all pacakges on CRAN/Bioconductor. The packages
-of the analysis were retrieved on 2021-10-28. The database can be opened by the `open_website()` function.
-
-```{r, eval = FALSE}
-open_website()
-```
-
-Following is a screenshot of the database.
-
-<p><img src="screenshot.png" width="1000px" /></p>
+We performed heaviness analysis for all CRAN/Bioconductor packages which were retrieved on 2021-10-28. All
+the analysis reports can be found at https://pkgndep.github.io/.
 
 ## Session info
 

@@ -10,12 +10,12 @@
 # == value
 # The path of the HTML file of the report.
 #
-# == exaple
+# == example
 # if(interactive()) {
 #     x = readRDS(system.file("extdata", "ComplexHeatmap_dep.rds", package = "pkgndep"))
-#     html_report(x)
+#     dependency_report(x)
 # }
-html_report = function(pkg, file = NULL) {
+dependency_report = function(pkg, file = NULL) {
 	
 	if(identical(topenv(), .GlobalEnv)) {
 		template_file = "~/project/development/pkgndep/inst/extdata/package_report.html"
