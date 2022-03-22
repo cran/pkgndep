@@ -29,3 +29,6 @@ m
 library(ComplexHeatmap)
 Heatmap(m, name = "co-heaviness")
 
+## -----------------------------------------------------------------------------
+co_heaviness(x, jaccard = TRUE)
+

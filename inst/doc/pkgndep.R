@@ -35,14 +35,6 @@ heaviness(pkg)
 heaviness(pkg, rel = TRUE)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  foo = function(...) {
-#      check_pkg("pkg", ...)
-#  
-#      pkg::bar(...)
-#      ...
-#  }
-
-## ---- eval = FALSE------------------------------------------------------------
 #  db = available.packages(repos = BiocManager::repositories())
 
 ## ---- echo = FALSE------------------------------------------------------------
