@@ -34,19 +34,17 @@ plot(pkg)
 heaviness(pkg)
 heaviness(pkg, rel = TRUE)
 
-## ---- eval = FALSE------------------------------------------------------------
-#  db = available.packages(repos = BiocManager::repositories())
-
-## ---- echo = FALSE------------------------------------------------------------
-db = available.packages(repos = BiocManager::repositories(version = BiocManager:::.version_choose_best()))
+## -----------------------------------------------------------------------------
+chooseCRANmirror(ind = 1) # choose the mirror fro RStudio
+db = available.packages()
 
 ## -----------------------------------------------------------------------------
-system.time(p1 <- tools::package_dependencies("cola", db = db, recursive = TRUE)[[1]])
+system.time(p1 <- tools::package_dependencies("ggplot2", db = db, recursive = TRUE)[[1]])
 
 ## -----------------------------------------------------------------------------
 db2 = reformat_db(db)
 db2
-system.time(p2 <- db2$package_dependencies("cola", recursive = TRUE, simplify = TRUE))
+system.time(p2 <- db2$package_dependencies("ggplot2", recursive = TRUE, simplify = TRUE))
 
 ## -----------------------------------------------------------------------------
 identical(sort(p1), sort(p2))
