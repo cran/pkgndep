@@ -1,7 +1,7 @@
 
-<h2>Analysis on the dependency heaviness of R packages</h2> <p>R packages under analysis were retrieved from CRAN/Biocoductor on 2021-10-28. There are
+<h2>Analysis on the dependency heaviness of R packages</h2> <p>R packages under analysis were retrieved from CRAN/Biocoductor on <%=readLines(url("https://pkgndep.github.io/date.txt"))[1]%>. There are
 <b><%=n_cran%></b> packages from CRAN and <b><%=n_bioc%></b> packages from
-Bioconductor (<a href='https://bioconductor.org/packages/3.14/BiocViews.html#___Software' target='_blank'>bioc version 3.14</a>).</p>
+Bioconductor (<a href='https://bioconductor.org/packages/3.14/BiocViews.html#___Software' target='_blank'>bioc version 3.15</a>).</p>
 
 <div id="tabs">
   <ul>
@@ -186,7 +186,7 @@ if(exclude_children) {
 				          qq("<a href='?order_by=heaviness_on_children&reducible=@{reducible_str}&exclude_children=@{exclude_children_str}'>Heaviness on child packages</a>"), 
 				          qq("<a href='?order_by=n_children&reducible=@{reducible_str}&exclude_children=@{exclude_children_str}'>Number of child packages</a>"), 
 				          qq("<a href='?order_by=adjusted_heaviness_on_indirect_downstream&reducible=@{reducible_str}&exclude_children=@{exclude_children_str}'>Heaviness on indirect downstream packages (excluding children)</a>"), 
-				          qq("<a href='?order_by=n_indierct_downstream&reducible=@{reducible_str}&exclude_children=@{exclude_children_str}'>Number of indirect downstream packages (excluding children)</a>"))
+				          qq("<a href='?order_by=n_indirect_downstream&reducible=@{reducible_str}&exclude_children=@{exclude_children_str}'>Number of indirect downstream packages (excluding children)</a>"))
 } else {
 	col.names = c(qq("<a href='?order_by=package&reducible=@{reducible_str}'>Package</a>"), 
 			             "Repository",

@@ -1,11 +1,12 @@
 
 prepare_db = function(lib = NULL, verbose = TRUE) {
 
+	op = getOption("repo")
+	on.exit(options(repo = op))
+
 	bioc_version = pkgndep_opt$bioc_version
-	repos = c(BioCsoft = paste0("https://bioconductor.org/packages/", bioc_version, "/bioc"),
-              BioCann = paste0("https://bioconductor.org/packages/", bioc_version, "/data/annotation"),
-              BioCexp = paste0("https://bioconductor.org/packages/", bioc_version, "/data/experiment"),
-              CRAN = "https://cloud.r-project.org")
+	suppressMessages(repos <- BiocManager::repositories(version = bioc_version))
+	repos = repos[intersect(names(repos), c("BioCsoft", "BioCann", "BioCexp", "CRAN"))]
 	if(verbose) qqcat("retrieve package database from CRAN/Bioconductor(@{bioc_version})...\n")
 	oe = try(suppressMessages(db_remote <- available.packages(repos = repos)))
 

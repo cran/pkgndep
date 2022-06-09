@@ -11,6 +11,13 @@ invisible(dev.off())
 ## ---- fig.width = size[1], fig.height = size[2], out.width = "1000px", echo = FALSE----
 plot(x)
 
+## ---- echo = FALSE------------------------------------------------------------
+if(grepl("devel", R.version$status)) {
+  pkgndep = function(...) {
+      pkgndep::pkgndep(..., online = FALSE)
+  }
+}
+
 ## -----------------------------------------------------------------------------
 library(pkgndep)
 pkg = pkgndep("ComplexHeatmap")
