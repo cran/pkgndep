@@ -12,7 +12,7 @@
 
 
 
-<title>Check the Heaviness of Package Dependencies</title>
+<title>Check the heaviness of package dependencies</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
@@ -138,7 +138,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">Check the Heaviness of Package Dependencies</h1>
+<h1 class="title toc-ignore">Check the heaviness of package dependencies</h1>
 
 
 
@@ -169,8 +169,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pkgndep)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pkg <span class="ot">=</span> <span class="fu">pkgndep</span>(<span class="st">&quot;ComplexHeatmap&quot;</span>)</span></code></pre></div>
 <pre><code>## retrieve package database from CRAN/Bioconductor(3.15)...
-##   - 21308 remote packages on CRAN/Bioconductor.
-##   - 512 packages installed locally.
+##   - 21506 remote packages on CRAN/Bioconductor.
+##   - 513 packages installed locally.
 ## prepare dependency table...
 ## prepare reverse dependency table...</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pkg</span></code></pre></div>
@@ -234,28 +234,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>db <span class="ot">=</span> <span class="fu">available.packages</span>()</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(p1 <span class="ot">&lt;-</span> tools<span class="sc">::</span><span class="fu">package_dependencies</span>(<span class="st">&quot;ggplot2&quot;</span>, <span class="at">db =</span> db, <span class="at">recursive =</span> <span class="cn">TRUE</span>)[[<span class="dv">1</span>]])</span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   0.187   0.001   0.188</code></pre>
+##   0.195   0.001   0.196</code></pre>
 <p>In <strong>pkgndep</strong>, we implement a faster version of <code>package_dependencies()</code> function. First the database needs to be reformatted by <code>reformat_db()</code> function. The returned variable <code>db2</code> is a reference class object and its method <code>db2$package_dependencies()</code> can be used to retrieve dependency packages.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>db2 <span class="ot">=</span> <span class="fu">reformat_db</span>(db)</span></code></pre></div>
 <pre><code>## prepare dependency table...
 ## prepare reverse dependency table...</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>db2</span></code></pre></div>
-<pre><code>## A package database of 18360 packages.
-##   - 0 Bioconductor / 18360 CRAN / 0 other packages.</code></pre>
+<pre><code>## A package database of 18559 packages.
+##   - 0 Bioconductor / 18559 CRAN / 0 other packages.</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(p2 <span class="ot">&lt;-</span> db2<span class="sc">$</span><span class="fu">package_dependencies</span>(<span class="st">&quot;ggplot2&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">simplify =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   0.004   0.000   0.004</code></pre>
+##   0.004   0.000   0.003</code></pre>
 <p><code>p1</code> and <code>p2</code> are actually identical:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">sort</span>(p1), <span class="fu">sort</span>(p2))</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="heaviness-analysis-for-all-cranbioconductor-packages" class="section level2">
 <h2>Heaviness analysis for all CRAN/Bioconductor packages</h2>
-<p>We performed heaviness analysis for all CRAN/Bioconductor packages which were retrieved on 2022-06-08. All the analysis reports can be found at <a href="https://pkgndep.github.io/" class="uri">https://pkgndep.github.io/</a>.</p>
+<p>We performed heaviness analysis for all CRAN/Bioconductor packages which were retrieved on 2022-06-08. All the analysis reports can be obtained by:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dependency_website</span>()</span></code></pre></div>
 </div>
 <div id="session-info" class="section level2">
 <h2>Session info</h2>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <pre><code>## R version 4.2.0 (2022-04-22)
 ## Platform: x86_64-apple-darwin17.0 (64-bit)
 ## Running under: macOS Big Sur/Monterey 10.16
@@ -272,7 +273,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## [8] base     
 ## 
 ## other attached packages:
-## [1] ComplexHeatmap_2.13.1 pkgndep_1.1.5         knitr_1.39           
+## [1] ComplexHeatmap_2.13.1 pkgndep_1.2.0         knitr_1.39           
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_1.0.9          BiocManager_1.30.18 highr_0.9          
