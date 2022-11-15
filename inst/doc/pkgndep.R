@@ -5,11 +5,11 @@ pkgndep:::load_all_pkg_dep()
 ## ---- echo = FALSE------------------------------------------------------------
 x = pkgndep:::env$all_pkg_dep[["cola"]]
 pdf(NULL)
-size = plot(x, help = FALSE)
+size = dependency_heatmap(x, help = FALSE)
 invisible(dev.off())
 
 ## ---- fig.width = size[1], fig.height = size[2], out.width = "1000px", echo = FALSE----
-plot(x)
+dependency_heatmap(x)
 
 ## ---- echo = FALSE------------------------------------------------------------
 if(grepl("devel", R.version$status)) {
@@ -25,14 +25,14 @@ pkg
 
 ## ---- echo = FALSE------------------------------------------------------------
 pdf(NULL)
-size = plot(pkg, help = FALSE)
+size = dependency_heatmap(pkg, help = FALSE)
 invisible(dev.off())
 
 ## ---- fig.width = size[1], fig.height = size[2], out.width = "1000px"---------
-plot(pkg)
+dependency_heatmap(pkg)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  plot(pkg, file = "test.png")
+#  dependency_heatmap(pkg, file = "test.png")
 
 ## ---- eval = FALSE------------------------------------------------------------
 #  dependency_report(pkg)

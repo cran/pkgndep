@@ -15,7 +15,7 @@ lt = load_all_pkg_dep()
 x = lt[["DESeq2"]]
 
 ## ---- fig.width = 36.96, fig.height = 8.34, out.width="1200px"----------------
-plot(x)
+dependency_heatmap(x)
 
 ## -----------------------------------------------------------------------------
 # or create the plot in an HTML page
