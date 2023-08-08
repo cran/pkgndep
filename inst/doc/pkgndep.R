@@ -3,7 +3,7 @@ library(pkgndep)
 pkgndep:::load_all_pkg_dep()
 
 ## ---- echo = FALSE------------------------------------------------------------
-x = pkgndep:::env$all_pkg_dep[["cola"]]
+x = pkgndep:::ENV$all_pkg_dep[["cola"]]
 pdf(NULL)
 size = dependency_heatmap(x, help = FALSE)
 invisible(dev.off())
@@ -35,7 +35,7 @@ dependency_heatmap(pkg)
 #  dependency_heatmap(pkg, file = "test.png")
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  dependency_report(pkg)
+#  heaviness_report(pkg)
 
 ## -----------------------------------------------------------------------------
 heaviness(pkg)
@@ -55,9 +55,6 @@ system.time(p2 <- db2$package_dependencies("ggplot2", recursive = TRUE, simplify
 
 ## -----------------------------------------------------------------------------
 identical(sort(p1), sort(p2))
-
-## ---- eval = FALSE------------------------------------------------------------
-#  dependency_website()
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

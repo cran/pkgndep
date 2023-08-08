@@ -11,8 +11,7 @@ knitr::opts_chunk$set(
 
 ## ---- echo = FALSE------------------------------------------------------------
 library(pkgndep)
-lt = load_all_pkg_dep()
-x = lt[["DESeq2"]]
+x = readRDS(system.file("extdata", "DESeq2_dep.rds", package = "pkgndep"))
 
 ## ---- fig.width = 36.96, fig.height = 8.34, out.width="1200px"----------------
 dependency_heatmap(x)

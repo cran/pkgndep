@@ -1,16 +1,22 @@
-citHeader("The methods within the code package can be cited as:")
+## R package reference generated from DESCRIPTION metadata
+citation(auto = meta)
 
-citEntry(
-   entry="article",
+bibentry(
+   bibtype="Article",
    title = "Pkgndep: a tool for analyzing dependency heaviness of R packages",
    author = "Zuguang Gu, Daniel Huebschmann",
    journal = "Bioinformatics",
    year = 2022,
-   textVersion = "Gu, Z. (2022) Pkgndep: a tool for analyzing dependency heaviness of R packages. Bioinformatics."
+   textVersion = "Gu, Z. (2022) Pkgndep: a tool for analyzing dependency heaviness of R packages. Bioinformatics.",
+   doi = "10.1093/bioinformatics/btac449"
 )
 
-citFooter("This free open-source software implements academic
-research by the authors and co-workers. If you use it,
-please support the project by citing the appropriate
-journal articles.")
-
+bibentry(
+   bibtype="Article",
+   title = "On the dependency heaviness of CRAN/Bioconductor ecosystem",
+   author = "Zuguang Gu",
+   journal = "Journal of Systems and Software",
+   year = 2023,
+   textVersion = "Gu, Z. (2023) On the dependency heaviness of CRAN/Bioconductor ecosystem. Journal of Systems and Software.",
+   doi = "10.1016/j.jss.2023.111610"
+)

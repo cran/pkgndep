@@ -1,23 +1,23 @@
-\name{load_pkg_stat_snapshot}
-\alias{load_pkg_stat_snapshot}
+\name{load_pkg_namespace}
+\alias{load_pkg_namespace}
 \title{
-Load all package dependency statistics
+Load NAMESPACE files of all packages
 }
 \description{
-Load all package dependency statistics
+Load NAMESPACE files of all packages
 }
 \usage{
-load_pkg_stat_snapshot()
+load_pkg_namespace()
 }
 \details{
 It is calculated based on a specific CRAN/Bioconductor snapshot. The version is set via \code{\link{pkgndep_opt}}$heaviness_db_version.
 }
 \value{
-A data frame.
+A list of character vectors.
 }
 \examples{
 \dontrun{
-df = load_pkg_stat_snapshot()
-head(df)
+lt = load_pkg_namespace()
+lt[1:2]
 }
 }
