@@ -1,6 +1,6 @@
-CHANGES in VERSION 2.0.0
+CHANGES in VERSION 1.99.3
 
-* heaviness database: support most of CRAN/Bioc historical versions.
+* In the dependency database, link was corrected for NAMESPACE (it was wrongly linked to DESRIPTION)
 
 =================================
 

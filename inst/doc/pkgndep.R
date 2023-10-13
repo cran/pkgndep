@@ -1,17 +1,17 @@
-## ---- echo = FALSE, message = FALSE-------------------------------------------
+## ----echo = FALSE, message = FALSE--------------------------------------------
 library(pkgndep)
 pkgndep:::load_all_pkg_dep()
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 x = pkgndep:::ENV$all_pkg_dep[["cola"]]
 pdf(NULL)
 size = dependency_heatmap(x, help = FALSE)
 invisible(dev.off())
 
-## ---- fig.width = size[1], fig.height = size[2], out.width = "1000px", echo = FALSE----
+## ----fig.width = size[1], fig.height = size[2], out.width = "1000px", echo = FALSE----
 dependency_heatmap(x)
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 if(grepl("devel", R.version$status)) {
   pkgndep = function(...) {
       pkgndep::pkgndep(..., online = FALSE)
@@ -23,18 +23,18 @@ library(pkgndep)
 pkg = pkgndep("ComplexHeatmap")
 pkg
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 pdf(NULL)
 size = dependency_heatmap(pkg, help = FALSE)
 invisible(dev.off())
 
-## ---- fig.width = size[1], fig.height = size[2], out.width = "1000px"---------
+## ----fig.width = size[1], fig.height = size[2], out.width = "1000px"----------
 dependency_heatmap(pkg)
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  dependency_heatmap(pkg, file = "test.png")
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  heaviness_report(pkg)
 
 ## -----------------------------------------------------------------------------
